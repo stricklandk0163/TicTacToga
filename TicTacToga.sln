@@ -1,0 +1,23 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2008
+
+Project("{A6162192-4CDE-3CC8-B5A6-0D589300C5DE}") = "TicTacToga", "Assembly-CSharp.csproj", "{38052DD0-3C7C-05A5-C9D7-E5B056499FA6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{38052DD0-3C7C-05A5-C9D7-E5B056499FA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38052DD0-3C7C-05A5-C9D7-E5B056499FA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38052DD0-3C7C-05A5-C9D7-E5B056499FA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38052DD0-3C7C-05A5-C9D7-E5B056499FA6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Assembly-CSharp.csproj
+	EndGlobalSection
+EndGlobal
