@@ -13,6 +13,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class GameControl : MonoBehaviour {
     public Text[] board; //array to hold text elements that can have their text component changed to reflect moves
@@ -20,6 +21,8 @@ public class GameControl : MonoBehaviour {
     private int turnId; //0 = player's 1 turn, 1 = computer's turn(player 2)
     private bool isGameWon = false; //bool for when game is won
     private int tieCount = 0, playerCount = 0, computerCount = 0; //win counters
+
+    private bool computerThinking = false;
 
 	// Use this for initialization
 	void Awake () {
@@ -29,16 +32,12 @@ public class GameControl : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         if (turnId == 1){ //computer's turn
-            int spot = Random.Range(0, board.Length); //make a random spot to place an O
-
-            if (board[spot].text == ""){ //if the spot is empty
-                board[spot].text = "O"; //place an O
-
-                TestBoard(0, 'O'); //test if the board is full and switch turns
+            if(!computerThinking)
+            {
+                //computerThinking = true;
+                ComputerAI();
             }
-            else { //if the spot is taken, find a new one randomly
-                spot = Random.Range(0, board.Length);
-            }
+            
         }
 	}
 
@@ -203,5 +202,259 @@ public class GameControl : MonoBehaviour {
             isGameWon = true;
         else if (board[2].text != "" && board[2].text == board[4].text && board[2].text == board[6].text)
             isGameWon = true;
+    }
+
+    void ComputerAI()
+    {
+        bool placed = false;
+        int diag = AITestDiagonals();
+        int cols = AITestColumns();
+        int rows = AITestRows();
+
+        if(diag != 11 && !placed)
+        {
+            if(board[diag].text == "")
+            {
+                board[diag].text = "O";
+
+                TestBoard(0, 'O'); //test if the board is full and switch turns
+                placed = true;
+            }
+        }
+        if(cols != 11 && !placed)
+        {
+            if (board[cols].text == "")
+            {
+                board[cols].text = "O";
+
+                TestBoard(0, 'O'); //test if the board is full and switch turns
+                placed = true;
+            }
+        }
+        if(rows != 11 && !placed)
+        {
+            if (board[rows].text == "")
+            {
+                board[rows].text = "O";
+
+                TestBoard(0, 'O'); //test if the board is full and switch turns
+                placed = true;
+            }
+        }
+        if(!placed)
+        {
+            int spot = Random.Range(0, board.Length); //make a random spot to place an O
+
+            if (board[spot].text == "")
+            { //if the spot is empty
+                board[spot].text = "O"; //place an O
+
+                TestBoard(0, 'O'); //test if the board is full and switch turns
+                placed = true;
+            }
+            else
+            { //if the spot is taken, find a new one randomly
+                spot = Random.Range(0, board.Length);
+            }
+        }
+    }
+
+    int AITestColumns()
+    {
+        int num_0 = 0;
+        int num_1 = 0;
+        int num_2 = 0;
+
+        int placeNum_0 = 11;
+        int placeNum_1 = 11;
+        int placeNum_2 = 11;
+        
+
+        for(int i = 0; i < board.Length; i=i+3)
+        {
+            if(board[i].text == "X")
+            {
+                num_0++;
+            }
+            else
+            {
+                placeNum_0 = i;
+            }
+        }
+
+        for (int i = 1; i < board.Length; i = i + 3)
+        {
+            if (board[i].text == "X")
+            {
+                num_1++;
+            }
+            else
+            {
+                placeNum_1 = i;
+            }
+        }
+
+        for (int i = 2; i < board.Length; i = i + 3)
+        {
+            if (board[i].text == "X")
+            {
+                num_2++;
+            }
+            else
+            {
+                placeNum_2 = i;
+            }
+        }
+
+        if (num_0 == 2)
+        {
+            if(placeNum_0 != 11)
+            {
+                return placeNum_0;
+            }
+        }
+
+        if (num_1 == 2)
+        {
+            if (placeNum_1 != 11)
+            {
+                return placeNum_1;
+            }
+        }
+
+        if (num_2 == 2)
+        {
+            if (placeNum_2 != 11)
+            {
+                return placeNum_2;
+            }
+        }
+
+        return 11;
+    }
+
+    int AITestRows()
+    {
+        int num_0 = 0;
+        int num_1 = 0;
+        int num_2 = 0;
+
+        int placeNum_0 = 11;
+        int placeNum_1 = 11;
+        int placeNum_2 = 11;
+
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (board[i].text == "X")
+            {
+                num_0++;
+            }
+            else
+            {
+                placeNum_0 = i;
+            }
+        }
+
+        for (int i = 3; i < 6; i++)
+        {
+            if (board[i].text == "X")
+            {
+                num_1++;
+            }
+            else
+            {
+                placeNum_1 = i;
+            }
+        }
+
+        for (int i = 6; i < 9; i++)
+        {
+            if (board[i].text == "X")
+            {
+                num_2++;
+            }
+            else
+            {
+                placeNum_2 = i;
+            }
+        }
+
+        if (num_0 == 2)
+        {
+            if (placeNum_0 != 11)
+            {
+                return placeNum_0;
+            }
+        }
+
+        if (num_1 == 2)
+        {
+            if (placeNum_1 != 11)
+            {
+                return placeNum_1;
+            }
+        }
+
+        if (num_2 == 2)
+        {
+            if (placeNum_2 != 11)
+            {
+                return placeNum_2;
+            }
+        }
+
+        return 11;
+    }
+
+    int AITestDiagonals()
+    {
+        int num_0 = 0;
+        int num_1 = 0;
+
+        int placeNum_0 = 11;
+        int placeNum_1 = 11;
+
+        for (int i = 0; i < board.Length; i = i + 4)
+        {
+            if (board[i].text == "X")
+            {
+                num_0++;
+            }
+            else
+            {
+                placeNum_0 = i;
+            }
+        }
+
+        for (int i = 2; i < 6; i = i + 2)
+        {
+            if (board[i].text == "X")
+            {
+                num_1++;
+            }
+            else
+            {
+                placeNum_1 = i;
+            }
+        }
+
+        if (num_0 == 2)
+        {
+            if (placeNum_0 != 11)
+            {
+                return placeNum_0;
+            }
+        }
+
+        if (num_1 == 2)
+        {
+            if (placeNum_1 != 11)
+            {
+                return placeNum_1;
+            }
+        }
+
+        return 11;
     }
 }
