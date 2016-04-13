@@ -427,7 +427,7 @@ public class GameControl : MonoBehaviour {
             }
         }
 
-        for (int i = 2; i < 6; i = i + 2)
+        for (int i = 2; i < 7; i = i + 2)
         {
             if (board[i].text == "X")
             {
