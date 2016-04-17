@@ -14,6 +14,7 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Text;
 
 public class GameControl : MonoBehaviour {
     public Text[] board; //array to hold text elements that can have their text component changed to reflect moves
@@ -21,8 +22,19 @@ public class GameControl : MonoBehaviour {
     private int turnId; //0 = player's 1 turn, 1 = computer's turn(player 2)
     private bool isGameWon = false; //bool for when game is won
     private int tieCount = 0, playerCount = 0, computerCount = 0; //win counters
-
+    private int computerMoveChoice = 0;
     private bool computerThinking = false;
+
+    class Move
+    {
+        public Move(string board, int moveIndex)
+        {
+            this.board = board;
+            this.moveIndex = moveIndex;
+        }
+        public string board { get; set; }
+        public int moveIndex { get; set; }
+    }
 
 	// Use this for initialization
 	void Awake () {
@@ -35,7 +47,15 @@ public class GameControl : MonoBehaviour {
             if(!computerThinking)
             {
                 //computerThinking = true;
-                ComputerAI();
+                string boardNode = "";
+                foreach(Text cell in board)
+                {
+                    boardNode += cell;
+                }
+                int depth = boardNode.Split(' ').Length - 1;
+                MiniMax(boardNode, depth, "O", "O");
+                board[computerMoveChoice].text = "O"; 
+                TestBoard(0, 'X'); //test if the board is full and switch turns
             }
             
         }
@@ -204,257 +224,146 @@ public class GameControl : MonoBehaviour {
             isGameWon = true;
     }
 
-    void ComputerAI()
+    //Get index of best score from score list
+    int getBestScoreIndex(List<int> scores)
     {
-        bool placed = false;
-        int diag = AITestDiagonals();
-        int cols = AITestColumns();
-        int rows = AITestRows();
-
-        if(diag != 11 && !placed)
+        int bestScore = scores[0];
+        foreach(int score in scores)
         {
-            if(board[diag].text == "")
-            {
-                board[diag].text = "O";
-
-                TestBoard(0, 'O'); //test if the board is full and switch turns
-                placed = true;
-            }
+            bestScore = (score > bestScore) ? score : bestScore;
         }
-        if(cols != 11 && !placed)
-        {
-            if (board[cols].text == "")
-            {
-                board[cols].text = "O";
-
-                TestBoard(0, 'O'); //test if the board is full and switch turns
-                placed = true;
-            }
-        }
-        if(rows != 11 && !placed)
-        {
-            if (board[rows].text == "")
-            {
-                board[rows].text = "O";
-
-                TestBoard(0, 'O'); //test if the board is full and switch turns
-                placed = true;
-            }
-        }
-        if(!placed)
-        {
-            int spot = Random.Range(0, board.Length); //make a random spot to place an O
-
-            if (board[spot].text == "")
-            { //if the spot is empty
-                board[spot].text = "O"; //place an O
-
-                TestBoard(0, 'O'); //test if the board is full and switch turns
-                placed = true;
-            }
-            else
-            { //if the spot is taken, find a new one randomly
-                spot = Random.Range(0, board.Length);
-            }
-        }
+        return scores.IndexOf(bestScore);
     }
 
-    int AITestColumns()
+    //Get index of worst score from score list
+    int getWorstScoreIndex(List<int> scores)
     {
-        int num_0 = 0;
-        int num_1 = 0;
-        int num_2 = 0;
-
-        int placeNum_0 = 11;
-        int placeNum_1 = 11;
-        int placeNum_2 = 11;
-        
-
-        for(int i = 0; i < board.Length; i=i+3)
+        int worstScore = scores[0];
+        foreach (int score in scores)
         {
-            if(board[i].text == "X")
-            {
-                num_0++;
-            }
-            else
-            {
-                placeNum_0 = i;
-            }
+            worstScore = (score < worstScore) ? score : worstScore;
         }
-
-        for (int i = 1; i < board.Length; i = i + 3)
-        {
-            if (board[i].text == "X")
-            {
-                num_1++;
-            }
-            else
-            {
-                placeNum_1 = i;
-            }
-        }
-
-        for (int i = 2; i < board.Length; i = i + 3)
-        {
-            if (board[i].text == "X")
-            {
-                num_2++;
-            }
-            else
-            {
-                placeNum_2 = i;
-            }
-        }
-
-        if (num_0 == 2)
-        {
-            if(placeNum_0 != 11)
-            {
-                return placeNum_0;
-            }
-        }
-
-        if (num_1 == 2)
-        {
-            if (placeNum_1 != 11)
-            {
-                return placeNum_1;
-            }
-        }
-
-        if (num_2 == 2)
-        {
-            if (placeNum_2 != 11)
-            {
-                return placeNum_2;
-            }
-        }
-
-        return 11;
+        return scores.IndexOf(worstScore);
     }
 
-    int AITestRows()
+    //Generate a list of possible children given current board and current player
+    List<Move> generateChildren(string node, string player)
     {
-        int num_0 = 0;
-        int num_1 = 0;
-        int num_2 = 0;
+        List<Move> children = new List<Move>();
 
-        int placeNum_0 = 11;
-        int placeNum_1 = 11;
-        int placeNum_2 = 11;
-
-
-        for (int i = 0; i < 3; i++)
+        //Get indices of blank spaces (These have not yet be placed)
+        var foundIndexes = new List<int>();
+        for (int i = node.IndexOf(' '); i > -1; i = node.IndexOf(' ', i + 1))
         {
-            if (board[i].text == "X")
-            {
-                num_0++;
-            }
-            else
-            {
-                placeNum_0 = i;
-            }
+            foundIndexes.Add(i);
         }
 
-        for (int i = 3; i < 6; i++)
+        //Generate children by replacing blank spaces with the player's token (X or O)
+        foreach(int index in foundIndexes)
         {
-            if (board[i].text == "X")
-            {
-                num_1++;
-            }
-            else
-            {
-                placeNum_1 = i;
-            }
+            string board = node;
+            //child[indice] = player;
+            StringBuilder boardSB = new StringBuilder(board);
+            boardSB[index] = player[0];
+            board = boardSB.ToString();
+            Move child = new Move(board, index);
+            children.Add(child);
         }
+        return children;
 
-        for (int i = 6; i < 9; i++)
-        {
-            if (board[i].text == "X")
-            {
-                num_2++;
-            }
-            else
-            {
-                placeNum_2 = i;
-            }
-        }
-
-        if (num_0 == 2)
-        {
-            if (placeNum_0 != 11)
-            {
-                return placeNum_0;
-            }
-        }
-
-        if (num_1 == 2)
-        {
-            if (placeNum_1 != 11)
-            {
-                return placeNum_1;
-            }
-        }
-
-        if (num_2 == 2)
-        {
-            if (placeNum_2 != 11)
-            {
-                return placeNum_2;
-            }
-        }
-
-        return 11;
     }
 
-    int AITestDiagonals()
+    //Check for a win from either player
+    //True if win found false otherwise
+    bool Win(string node)
     {
-        int num_0 = 0;
-        int num_1 = 0;
-
-        int placeNum_0 = 11;
-        int placeNum_1 = 11;
-
-        for (int i = 0; i < board.Length; i = i + 4)
+        //Check all possible wins from either player
+        char[] players = { 'O', 'X' };
+        foreach (char player in players)
         {
-            if (board[i].text == "X")
-            {
-                num_0++;
-            }
+            if (CheckDiagonalWin(node, player) || CheckVerticalWin(node, player) || CheckHorizontalWin(node, player))
+                return true;
+        }
+        return false;
+    }
+
+    //Check for a diagonal win
+    bool CheckDiagonalWin(string node, char player)
+    {
+        return ((node[0] == player && node[4] == player && node[8] == player) ||
+            (node[2] == player && node[4] == player && node[6] == player));
+
+    }
+
+    //Check for a vertical win
+    bool CheckVerticalWin(string node, char player)
+    {
+        return ((node[0] == player && node[3] == player && node[6] == player) ||
+             (node[1] == player && node[4] == player && node[7] == player) ||
+             (node[2] == player && node[5] == player && node[8] == player));
+    }
+
+    //Check for a horizontal win
+    bool CheckHorizontalWin(string node, char player)
+    {
+        return ((node[0] == player && node[1] == player && node[2] == player) ||
+            (node[3] == player && node[4] == player && node[5] == player) ||
+            (node[6] == player && node[7] == player && node[8] == player));
+    }
+
+    //Run minimax algorithm
+    //Sets computerMoveChoice to the index of the best move the computer can make
+    int MiniMax(string node, int depth, string currentPlayer, string maximizingPlayer)
+    {
+        //List of possible scores from children
+        List<int> scores = new List<int>();
+
+        //Check for win if the current player is the maximizing player they lost and vice versa
+        if (Win(node))
+        {
+            if (currentPlayer == maximizingPlayer)
+                return -1;  
             else
-            {
-                placeNum_0 = i;
-            }
+                return 1;
         }
 
-        for (int i = 2; i < 7; i = i + 2)
+        //If depth is 0 and noone one, the game is a tie with 0 score
+        else if (depth == 0)
         {
-            if (board[i].text == "X")
-            {
-                num_1++;
-            }
-            else
-            {
-                placeNum_1 = i;
-            }
+            return 0;
         }
 
-        if (num_0 == 2)
+        //If we are the maximizing player we want the best option
+        else if (currentPlayer == maximizingPlayer)
         {
-            if (placeNum_0 != 11)
+            string minimizingPlayer = (maximizingPlayer == "X") ? "X" : "O";
+
+            //Find all child boards possible and get their scores
+            List<Move> children = generateChildren(node, currentPlayer);
+            foreach(Move child in children)
             {
-                return placeNum_0;
+                scores.Add(MiniMax(child.board, depth-1, minimizingPlayer, maximizingPlayer));
             }
+
+            //Find the best move and return it's score also set computer to make that move
+            var maxIndex = getBestScoreIndex(scores);
+            computerMoveChoice = children[maxIndex].moveIndex;
+            return scores[maxIndex];
         }
 
-        if (num_1 == 2)
+        //If we are the minimizing player we want the worst option for the max player
+        else
         {
-            if (placeNum_1 != 11)
+            //Find all child boards possible and get their scores
+            List<Move> children = generateChildren(node, currentPlayer);
+            foreach (Move child in children)
             {
-                return placeNum_1;
+                scores.Add(MiniMax(child.board, depth - 1, maximizingPlayer, maximizingPlayer));
             }
-        }
 
-        return 11;
+            //Find the worst score the maximizing player will assume this is the minimizing players choice
+            var minIndex = getWorstScoreIndex(scores);
+            return scores[minIndex];
+        }
     }
 }
