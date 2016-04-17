@@ -22,7 +22,7 @@ public class GameControl : MonoBehaviour {
     private int turnId; //0 = player's 1 turn, 1 = computer's turn(player 2)
     private bool isGameWon = false; //bool for when game is won
     private int tieCount = 0, playerCount = 0, computerCount = 0; //win counters
-    private int computerMoveChoice = 0;
+    public int computerMoveChoice = 0;
     private bool computerThinking = false;
 
     class Move
@@ -50,12 +50,13 @@ public class GameControl : MonoBehaviour {
                 string boardNode = "";
                 foreach(Text cell in board)
                 {
-                    boardNode += cell;
+                    boardNode += cell.text;
                 }
                 int depth = boardNode.Split(' ').Length - 1;
+                print(" BoardNode: " + boardNode + " BoardNode Length: " + boardNode.Length);
                 MiniMax(boardNode, depth, "O", "O");
                 board[computerMoveChoice].text = "O"; 
-                TestBoard(0, 'X'); //test if the board is full and switch turns
+                TestBoard(0, 'O'); //test if the board is full and switch turns
             }
             
         }
@@ -65,7 +66,7 @@ public class GameControl : MonoBehaviour {
      * Button0Clicked() is called top left button is clicked
      */
     public void Button0Clicked(){
-        if (turnId == 0 && board[0].text == ""){ //if it is the player's turn and the board section is empty, place an X
+        if (turnId == 0 && board[0].text == " "){ //if it is the player's turn and the board section is empty, place an X
             board[0].text = "X";
             TestBoard(1, 'X'); //test if the board is full and switch turns
         }
@@ -75,7 +76,7 @@ public class GameControl : MonoBehaviour {
      * Button1Clicked() is called top center button is clicked
      */
     public void Button1Clicked(){
-        if (turnId == 0 && board[1].text == ""){ //if it is the player's turn and the board section is empty, place an X
+        if (turnId == 0 && board[1].text == " "){ //if it is the player's turn and the board section is empty, place an X
             board[1].text = "X";
             TestBoard(1, 'X'); //test if the board is full and switch turns
         }
@@ -85,7 +86,7 @@ public class GameControl : MonoBehaviour {
      * Button2Clicked() is called top right button is clicked
      */
     public void Button2Clicked(){
-        if (turnId == 0 && board[2].text == ""){ //if it is the player's turn and the board section is empty, place an X
+        if (turnId == 0 && board[2].text == " "){ //if it is the player's turn and the board section is empty, place an X
             board[2].text = "X";
             TestBoard(1, 'X'); //test if the board is full and switch turns
         }
@@ -95,7 +96,7 @@ public class GameControl : MonoBehaviour {
      * Button3Clicked() is called center left button is clicked
      */
     public void Button3Clicked(){
-        if (turnId == 0 && board[3].text == ""){ //if it is the player's turn and the board section is empty, place an X
+        if (turnId == 0 && board[3].text == " "){ //if it is the player's turn and the board section is empty, place an X
             board[3].text = "X";
             TestBoard(1, 'X'); //test if the board is full and switch turns
         }
@@ -105,7 +106,7 @@ public class GameControl : MonoBehaviour {
      * Button4Clicked() is called center button is clicked
      */
     public void Button4Clicked(){
-        if (turnId == 0 && board[4].text == ""){ //if it is the player's turn and the board section is empty, place an X
+        if (turnId == 0 && board[4].text == " "){ //if it is the player's turn and the board section is empty, place an X
             board[4].text = "X";
             TestBoard(1, 'X'); //test if the board is full and switch turns
         }
@@ -115,7 +116,7 @@ public class GameControl : MonoBehaviour {
      * Button5Clicked() is called center right button is clicked
      */
     public void Button5Clicked(){
-        if (turnId == 0 && board[5].text == ""){ //if it is the player's turn and the board section is empty, place an X
+        if (turnId == 0 && board[5].text == " "){ //if it is the player's turn and the board section is empty, place an X
             board[5].text = "X";
             TestBoard(1, 'X'); //test if the board is full and switch turns
         }
@@ -125,7 +126,7 @@ public class GameControl : MonoBehaviour {
      * Button6Clicked() is called bottom left button is clicked
      */
     public void Button6Clicked(){
-        if (turnId == 0 && board[6].text == ""){ //if it is the player's turn and the board section is empty, place an X
+        if (turnId == 0 && board[6].text == " "){ //if it is the player's turn and the board section is empty, place an X
             board[6].text = "X";
             TestBoard(1, 'X'); //test if the board is full and switch turns
         }
@@ -135,7 +136,7 @@ public class GameControl : MonoBehaviour {
      * Button7Clicked() is called bottom center button is clicked
      */
     public void Button7Clicked(){
-        if (turnId == 0 && board[7].text == ""){ //if it is the player's turn and the board section is empty, place an X
+        if (turnId == 0 && board[7].text == " "){ //if it is the player's turn and the board section is empty, place an X
             board[7].text = "X";
             TestBoard(1, 'X'); //test if the board is full and switch turns
         }
@@ -145,7 +146,7 @@ public class GameControl : MonoBehaviour {
      * Button8Clicked() is called bottom right button is clicked
      */
     public void Button8Clicked(){
-        if (turnId == 0 && board[8].text == ""){ //if it is the player's turn and the board section is empty, place an X
+        if (turnId == 0 && board[8].text == " "){ //if it is the player's turn and the board section is empty, place an X
             board[8].text = "X";
             TestBoard(1, 'X'); //test if the board is full and switch turns
         }
@@ -160,7 +161,7 @@ public class GameControl : MonoBehaviour {
         isGameWon = false; // no winners yet
 
         for (int intel=0; intel<board.Length; intel++) //loop through board array and set text to ""
-            board[intel].text = "";
+            board[intel].text = " ";
     }
 
     /*
@@ -184,11 +185,11 @@ public class GameControl : MonoBehaviour {
         }
         else{
             for (int i = 0; i < board.Length; i++){ //loop through board to test if the game is finished
-                if (Equals(board[i].text, "")){ //if there is a board spot open, break out & change turn
+                if (Equals(board[i].text, " ")){ //if there is a board spot open, break out & change turn
                     turnId = nextTurnId; //switch to next player's turn
                     break;
                 }
-                else if (!Equals(board[i].text, "") && i == board.Length-1){ //if at end of board and it's not empty
+                else if (!Equals(board[i].text, " ") && i == board.Length-1){ //if at end of board and it's not empty
                     turnId = 2; //set this to 2 since it's a tie
                     tieCount++; //add a tie to count
                     tie.text = "Tie: " + tieCount; //update tie UI count
@@ -202,25 +203,25 @@ public class GameControl : MonoBehaviour {
      */ 
     void TestWin(){
         //Test row for a win
-        if (board[0].text != "" && board[0].text == board[3].text && board[0].text == board[6].text)
+        if (board[0].text != " " && board[0].text == board[3].text && board[0].text == board[6].text)
             isGameWon = true;
-        else if (board[1].text != "" && board[1].text == board[4].text && board[1].text == board[7].text)
+        else if (board[1].text != " " && board[1].text == board[4].text && board[1].text == board[7].text)
             isGameWon = true;
-        else if (board[2].text != "" && board[2].text == board[5].text && board[2].text == board[8].text)
+        else if (board[2].text != " " && board[2].text == board[5].text && board[2].text == board[8].text)
             isGameWon = true;
 
         //Test columns for a win
-        if (board[0].text != "" && board[0].text == board[1].text && board[0].text == board[2].text)
+        if (board[0].text != " " && board[0].text == board[1].text && board[0].text == board[2].text)
             isGameWon = true;
-        else if (board[3].text != "" && board[3].text == board[4].text && board[3].text == board[5].text)
+        else if (board[3].text != " " && board[3].text == board[4].text && board[3].text == board[5].text)
             isGameWon = true;
-        else if (board[6].text != "" && board[6].text == board[7].text && board[6].text == board[8].text)
+        else if (board[6].text != " " && board[6].text == board[7].text && board[6].text == board[8].text)
             isGameWon = true;
 
         //Test Diagonals for a win
-        if (board[0].text != "" && board[0].text == board[4].text && board[0].text == board[8].text)
+        if (board[0].text != " " && board[0].text == board[4].text && board[0].text == board[8].text)
             isGameWon = true;
-        else if (board[2].text != "" && board[2].text == board[4].text && board[2].text == board[6].text)
+        else if (board[2].text != " " && board[2].text == board[4].text && board[2].text == board[6].text)
             isGameWon = true;
     }
 
