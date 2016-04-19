@@ -24,6 +24,7 @@ public class GameControl : MonoBehaviour {
     private int tieCount = 0, playerCount = 0, computerCount = 0; //win counters
     public int computerMoveChoice = 0;
     private bool computerThinking = false;
+    public int counter = 0, counter2 = 0;
 
     class Move
     {
@@ -58,7 +59,6 @@ public class GameControl : MonoBehaviour {
                 board[computerMoveChoice].text = "O"; 
                 TestBoard(0, 'O'); //test if the board is full and switch turns
             }
-            
         }
 	}
 
@@ -323,7 +323,7 @@ public class GameControl : MonoBehaviour {
         if (Win(node))
         {
             if (currentPlayer == maximizingPlayer)
-                return -1;  
+                return -1;
             else
                 return 1;
         }
@@ -337,7 +337,7 @@ public class GameControl : MonoBehaviour {
         //If we are the maximizing player we want the best option
         else if (currentPlayer == maximizingPlayer)
         {
-            string minimizingPlayer = (maximizingPlayer == "X") ? "X" : "O";
+            string minimizingPlayer = (maximizingPlayer == "X") ? "O" : "X";
 
             //Find all child boards possible and get their scores
             List<Move> children = generateChildren(node, currentPlayer);
