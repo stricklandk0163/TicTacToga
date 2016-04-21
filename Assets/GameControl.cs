@@ -165,6 +165,14 @@ public class GameControl : MonoBehaviour {
     }
 
     /*
+     * QuitGame() it quits the game obviously
+     */
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
+
+    /*
      * TestBoard() tests if the board is full and changes the turn to the right player
      */
     void TestBoard(int nextTurnId, char placedPiece)
