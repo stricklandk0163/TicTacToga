@@ -15,6 +15,7 @@ using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 
 public class GameControl : MonoBehaviour {
     public Text[] board; //array to hold text elements that can have their text component changed to reflect moves
@@ -22,9 +23,9 @@ public class GameControl : MonoBehaviour {
     private int turnId; //0 = player's 1 turn, 1 = computer's turn(player 2)
     private bool isGameWon = false; //bool for when game is won
     private int tieCount = 0, playerCount = 0, computerCount = 0; //win counters
-    public int computerMoveChoice = 0;
+    private int computerMoveChoice = 0;
     private bool computerThinking = false;
-    public int counter = 0, counter2 = 0;
+    private string boardNode;
 
     class Move
     {
@@ -48,13 +49,12 @@ public class GameControl : MonoBehaviour {
             if(!computerThinking)
             {
                 //computerThinking = true;
-                string boardNode = "";
+                boardNode = "";
                 foreach(Text cell in board)
                 {
                     boardNode += cell.text;
                 }
                 int depth = boardNode.Split(' ').Length - 1;
-                print(" BoardNode: " + boardNode + " BoardNode Length: " + boardNode.Length);
                 MiniMax(boardNode, depth, "O", "O");
                 board[computerMoveChoice].text = "O"; 
                 TestBoard(0, 'O'); //test if the board is full and switch turns
@@ -182,6 +182,8 @@ public class GameControl : MonoBehaviour {
                 computerCount++; //add a win to computer
                 computer.text = "Computer: " + computerCount; //update computer win UI count
             }
+
+            Save(placedPiece); //save all the shit and pass in winning piece
         }
         else{
             for (int i = 0; i < board.Length; i++){ //loop through board to test if the game is finished
@@ -193,8 +195,43 @@ public class GameControl : MonoBehaviour {
                     turnId = 2; //set this to 2 since it's a tie
                     tieCount++; //add a tie to count
                     tie.text = "Tie: " + tieCount; //update tie UI count
+                    
+                    Save('F'); //save all the shit, pass in 'F' for a tie game
                 }
             }
+        }
+    }
+
+    //saves something
+    void Save(char winna)
+    {
+        if (File.Exists("TicTacTogaStats.txt")) //if the file exists somewhere write win stats
+        {
+            StreamWriter file = new StreamWriter("TicTacTogaStats.txt", true); //open the file and append any changes
+
+            //write stats of board and winner depending on passes in char
+            if(winna == 'X')
+                file.WriteLine("Gam Boawd: " + boardNode + " Winna:    " + winna);
+            else if(winna == 'O')
+                file.WriteLine("Gam Boawd: " + boardNode + " Winna:    " + winna);
+            else if(winna == 'F')
+                file.WriteLine("Gam Boawd: " + boardNode + " Winna:    " + "YOU BOTH SUCK");
+
+            file.Close();
+        }
+        else //if the file doesn't exist make a new one
+        {
+            StreamWriter file = new StreamWriter("TicTacTogaStats.txt");
+
+            //write stats of board and winner depending on passes in char
+            if (winna == 'X')
+                file.WriteLine("Gam Boawd: " + boardNode + " Winna:   " + winna);
+            else if (winna == 'O')
+                file.WriteLine("Gam Boawd: " + boardNode + " Winna:   " + winna);
+            else if (winna == 'F')
+                file.WriteLine("Gam Boawd: " + boardNode + " Winna:   " + "YOU BOTH SUCK");
+
+            file.Close();
         }
     }
 
